@@ -3,6 +3,7 @@ package DataSource;
 import DataClass.*;
 import Input.InputFromUser;
 import UtilClass.CalculatingAge;
+import UtilClass.Checking;
 import UtilClass.MD5;
 
 import javax.swing.*;
@@ -16,10 +17,12 @@ public class StudentFunction1 {
     Authentication authentications = new Authentication();
     InputFromUser inputFromUser = new InputFromUser();
     CalculatingAge calculatingAge = new CalculatingAge();
+    Checking checking = new Checking();
     static String uId;
     static int years;
     static String departMentName;
     static String roles;
+    String GREEN_BACKGROUND = "\u001B[42m";
 
     static Scanner sc = new Scanner(System.in);
     public static Scanner str = new Scanner(System.in);
@@ -29,16 +32,16 @@ public class StudentFunction1 {
     String departmentName,id,name, phoneNumber, mailId, fatherName;
     String subjectName, dateOfBirth, district,status;
     int mark, year;
-    String  date;
     int choice, semester;
     String passWord;
-    int count;
+    int count = 0;
     boolean success;
     GenderType gender;
     String userId , role, subjectCode;
     static String userName;
     String PURPLE =	"\u001B[35m";
     String ANSI_RESET = "\u001B[0m";
+    int sem, sem1;
 
 
     public static StudentFunction1 getInstance() {
@@ -99,12 +102,6 @@ public class StudentFunction1 {
 
 
     public void adminMenuOperation() throws Exception {
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-
             System.out.println("Welcome to Admin Menu");
             boolean on = true;
 
@@ -121,13 +118,13 @@ public class StudentFunction1 {
                         7 -->  for Search By StudentId
                         8 -->  for Search By StudentName
                         9 -->  for View Faculty Details
-                        10 --> for View Faculty Personal Details
-                        11 --> for view admission details
-                        12 --> for Remove Student
-                        13 --> for view student by their department & year
-                        14 --> for Change Password
-                        15 --> log out""");
+                        10 --> for view admission details
+                        11 --> for Remove Student
+                        12 --> for view student by their department & year
+                        13 --> for Change Password
+                        14 --> log out""");
                 System.out.println("-------------------------------------------------");
+                System.out.println(GREEN_BACKGROUND + "Enter your choice : " + ANSI_RESET);
                 choice = inputFromUser.inputChoice();
                 switch (choice) {
                     case 1 -> addDepartments();
@@ -168,11 +165,6 @@ public class StudentFunction1 {
 
     public void facultyOperation() throws Exception
     {
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
             System.out.println("Welcome to the Faculty Menu ");
             boolean on = true;
             while (on) {
@@ -190,6 +182,7 @@ public class StudentFunction1 {
                         9 --> Change Password
                         10 --> for Log Out""");
                 System.out.println("-------------------------------------------------");
+                System.out.println(GREEN_BACKGROUND + "Enter your choice : " + ANSI_RESET);
                 choice = inputFromUser.inputChoice();
                 switch (choice) {
                     case 1 -> addStudentMarks();
@@ -214,11 +207,6 @@ public class StudentFunction1 {
         }
 
     public void studentOperation() throws Exception {
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
             System.out.println("Welcome to Student Menu");
             boolean on = true;
             while (on) {
@@ -230,6 +218,7 @@ public class StudentFunction1 {
                         3 --> for Change Password
                         4 --> for Log Out""");
                 System.out.println("-------------------------------------------------");
+                System.out.println(GREEN_BACKGROUND + "Enter your choice : " + ANSI_RESET);
                 choice = inputFromUser.inputChoice();
                 switch (choice) {
                     case 1 -> searchByStudentId();
@@ -247,11 +236,6 @@ public class StudentFunction1 {
             }
     }
     public void newAdmissionOperation() throws Exception {
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
             System.out.println("Welcome to New Admission Menu");
             boolean on = true;
             while (on) {
@@ -262,6 +246,7 @@ public class StudentFunction1 {
                     2 --> for New Admission Form
                     3 --> for Log Out""");
                 System.out.println("-------------------------------------------------");
+                System.out.println(GREEN_BACKGROUND + "Enter your choice : " + ANSI_RESET);
                 choice = inputFromUser.inputChoice();
                 switch (choice) {
                     case 1 -> displayDepartmentDetails();
@@ -290,9 +275,19 @@ public class StudentFunction1 {
         {
             userId = uId;
         }
-        Student student;
-        student = con.getByStudentId(uId);
-        System.out.println(student.getRollNumber()+" "+student.getStudentName()+" "+student.getDepartmentName()+" "+student.getYear());
+        Faculty faculty;
+        faculty = con.getFacultyById(uId);
+        if(faculty != null) {
+            String align = "| %-11s | %-19s | %-19s | %-7d | %-19s | %-13s |%n";
+            System.out.format("+-------------+---------------------+---------------------+---------+---------------------+---------------+%n");
+            System.out.format("|Id           |FacultyName          |DepartmentName       |Year     |MailId               |PhoneNumber    |%n");
+            System.out.format("+-------------+---------------------+---------------------+---------+---------------------+---------------+%n");
+            System.out.format(align,faculty.getFacultyId(),faculty.getFacultyName(),faculty.getDepartmentName(),faculty.getYear(),faculty.getMailId(),faculty.getPhoneNumber());
+            System.out.format("+-------------+---------------------+---------------------+---------+---------------------+---------------+%n");
+        }else
+        {
+            System.out.println("...There is no record found...");
+        }
     }
 
     public void viewFailStudents() throws SQLException {
@@ -313,6 +308,7 @@ public class StudentFunction1 {
                     System.out.format(align, markDetails.getSubjectId(), markDetails.getSubName(), markDetails.getMarks());
                     System.out.format("+-------------+------------------------------+------+%n");
             }
+            count = 0;
         }else
         {
             System.out.println("..There is no records found..");
@@ -358,10 +354,6 @@ public class StudentFunction1 {
         String ANSI_RESET = "\u001B[0m";
         String ANSI_RED  = 	"\u001B[31m";
         System.out.println(ANSI_RED+"Note : Red colour denotes FailMark"+ANSI_RESET);
-        for (MarkDetails markDetails: markDetailsList)
-        {
-            System.out.println(markDetails);
-        }
         for (MarkDetails markDetails : markDetailsList)
         {
             if(count < 1)
@@ -376,7 +368,7 @@ public class StudentFunction1 {
 
                 if(markDetails.getMarks() < 50)
                 {
-                    mark1 = redBg + String.valueOf(markDetails.getMarks()) + bgReset;
+                    mark1 = redBg + markDetails.getMarks() + bgReset;
                 }else {
                     mark1 = String.valueOf(markDetails.getMarks());
 
@@ -387,42 +379,46 @@ public class StudentFunction1 {
         }
     }
 
-    public void addStudentMarks() throws SQLException {
+    public void addStudentMarks() throws Exception {
         System.out.println("Enter the roll Number of the student : ");
         id = inputFromUser.inputId();
         year = years;
         System.out.println("Enter the semester number : ");
         semester = sc.nextInt();
-        showSubjectDetails(year);
-        //List<MarkDetails>markDetailsList= new ArrayList<>();
-        MarkDetails [] markDetails = new MarkDetails[count];
-        for(int i = 0; i < count; i++)
+        Student student;
+        student = con.getByStudentId(id);
+        if(student == null)
         {
-            System.out.println("Enter the subject code : ");
-            subjectCode = sc.next();
-            System.out.println("Enter the Mark : ");
-            mark = sc.nextInt();
-            //markDetailsList.add(new MarkDetails(id,departmentId,semester,subjectCode,mark));
-            markDetails[i] = new MarkDetails(id,departMentName,semester,subjectCode,mark);
+            System.out.println("Please check the roll number");
+            facultyOperation();
         }
-        for (MarkDetails markDetail : markDetails) {
-            System.out.println(markDetail);
-        }
-        success = con.insertMarks(markDetails);
+        else {
+            if (student.getYear() == years && student.getDepartmentName().equalsIgnoreCase(departMentName)) {
+                showSubjectDetails(year);
+                id = "'" + id + "'";
+                departmentName = "'" + departMentName + "'";
+                MarkDetails[] markDetails = new MarkDetails[count];
+                for (int i = 0; i < count; i++) {
+                    System.out.println("Enter the subject code : ");
+                    subjectCode = sc.next();
+                    subjectCode = "'" + subjectCode + "'";
+                    System.out.println("Enter the Mark : ");
+                    mark = sc.nextInt();
+                    markDetails[i] = new MarkDetails(id, departmentName, semester, subjectCode, mark);
+                }
+                success = con.insertMarks(markDetails);
 
-        if(success)
-        {
-            System.out.println("Mark details added successfully");
+                if (!success) {
+                    System.out.println("Mark Details are not added");
+                } else {
+                    System.out.println("Mark details added successfully");
+                }
+            }
         }
-        else
-        {
-            System.out.println("Mark Details are not added");
-        }
-
 
     }
 
-    public void showSubjectDetails(int year ) {
+    public void showSubjectDetails(int year) {
         switch (year)
         {
             case 1, 2 -> {
@@ -430,10 +426,13 @@ public class StudentFunction1 {
                 count = 4;
             }
             case 3 -> {
+
                 System.out.println("Three Subject for each semester ");
                 count = 3;
             }
             case 4 -> {
+                sem = 7;
+                sem1 = 8;
                 System.out.println("Two Subject for each semester ");
                 count = 2;
             }
@@ -469,9 +468,9 @@ public class StudentFunction1 {
         dateOfBirth = inputFromUser.inputDob();
         role = "Student";
         Student student = new Student(id,name,departmentName,year,mailId,phoneNumber,role);
-        boolean inserted = con.insertStudentAcademicDetails(student);
+        boolean inserted = con.addStudentAcademicDetails(student);
         PersonalDetails personalDetails = new PersonalDetails(id,dateOfBirth,gender,district);
-        boolean inserted1 = con.insertPersonalDetails(personalDetails);
+        boolean inserted1 = con.addPersonalDetails(personalDetails);
         success = con.newUser(id,dateOfBirth,role);
         if(inserted1 && inserted)
         {
@@ -503,7 +502,7 @@ public class StudentFunction1 {
         availableSeats = sc.nextInt();
         System.out.println("Enter the cutOff Mark for this department : ");
         cutOffMark = sc.nextInt();
-        boolean a = con.insertDepartment(departmentId,departmentName,availableSeats,cutOffMark);
+        boolean a = con.addDepartment(departmentId,departmentName,availableSeats,cutOffMark);
         if(a)
         {
             System.out.println("Successfully added");
@@ -515,22 +514,24 @@ public class StudentFunction1 {
     {
         System.out.println("Enter the Faculty(ClassIncharge) Id : ");
         id = inputFromUser.inputId();
+        checkDuplicate(id);
         System.out.println(PURPLE+"Enter the name:"+ANSI_RESET);
-        inputFromUser.inputName();
+        name = inputFromUser.inputName();
         System.out.println("Enter the Gender in the format of (Male - 1/Female - 2/Others - 3) : ");
         gender = GenderType.values()[sc.nextInt()-1];
         dateOfBirth    = inputFromUser.inputDob();
         departmentName = inputFromUser.inputDepartmentName();
+        System.out.println("Enter the year : ");
         year           = inputFromUser.inputChoice();
         mailId         = inputFromUser.inputMailId();
-        phoneNumber    = inputFromUser.inputPhoneNumber();
-        date           = inputFromUser.inputDob();
+        System.out.println("Enter the Phone number");
+        phoneNumber    = checking.checkPhonenumber(sc.next());
         district       = inputFromUser.inputDistrictName();
-        Student student   = new Student(id,name,departmentName,year,mailId,phoneNumber,role);
-        boolean inserted  = con.insertStudentAcademicDetails(student);
-        PersonalDetails personalDetails = new PersonalDetails(id,dateOfBirth,gender,district);
-        boolean inserted1 = con.insertPersonalDetails(personalDetails);
         role = "Faculty";
+        Student student   = new Student(id,name,departmentName,year,mailId,phoneNumber,role);
+        boolean inserted  = con.addStudentAcademicDetails(student);
+        PersonalDetails personalDetails = new PersonalDetails(id,dateOfBirth,gender,district);
+        boolean inserted1 = con.addPersonalDetails(personalDetails);
         con.newUser(id,dateOfBirth,role);
         if(inserted && inserted1)
         {
@@ -547,44 +548,43 @@ public class StudentFunction1 {
         departmentId = sc.nextInt();
         System.out.println("Enter the Semester : ");
         semester = sc.nextInt();
-        for (int i = 0 ; i < choice;i++)
-        {
+        for (int i = 0; i < choice; i++) {
             System.out.println("Enter the subject code");
             subjectCode = sc.next();
             System.out.println("Enter the Subject Name");
             subjectName = str.nextLine();
-            con.insertSubjectDetails(subjectCode,subjectName,departmentId,semester);
+            success = con.addSubjectDetails(subjectCode, subjectName, departmentId, semester);
+        }
+        if (success) {
+            System.out.println("Subject details added successfully");
+        } else
+        {
+            System.out.println("Subject details can't added");
         }
     }
 
     public void addNewAdmission() throws Exception
     {
-        String CYAN	= "\u001B[36m";
         System.out.println(PURPLE+"Enter the name:"+ANSI_RESET);
         name = inputFromUser.inputName();
         dateOfBirth = inputFromUser.inputDob();
-        int age = calculatingAge.ageCalculation(dateOfBirth);
-        if(age > 26)
+        success = calculatingAge.ageCalculation(dateOfBirth);
+        if(success) {
+            detailsOfStudents();
+            System.out.println("Enter the 12th Physics mark : ");
+            int m1 = inputFromUser.inputInteger();
+            System.out.println("Enter the 12th Chemistry mark : ");
+            int m2 = inputFromUser.inputInteger();
+            System.out.println("Enter the 12th Maths mark : ");
+            int m3 = inputFromUser.inputInteger();
+            cutOffMark = (m1 / 2) + (m2 / 4) + (m3 / 4);
+            departmentName = inputFromUser.inputDepartmentName();
+            status = checkSeatAvailable(departmentName, cutOffMark);
+            success = con.addNewAdmissionDetails(name, dateOfBirth, gender, cutOffMark, departmentName, status, mailId, district);
+        }else
         {
-            System.out.println(CYAN+"Sorry your age is "+age+" greater than 26..in our college we have a age limit"+ANSI_RESET);
-            authentications.logOut();
+            newAdmissionOperation();
         }
-        detailsOfStudents();
-        System.out.println("Enter the 12th Physics mark : ");
-        int m1 = inputFromUser.inputInteger();
-        System.out.println("Enter the 12th Chemistry mark : ");
-        int m2 = inputFromUser.inputInteger();
-        System.out.println("Enter the 12th Maths mark : ");
-        int m3 = inputFromUser.inputInteger();
-        cutOffMark = (m1 / 2) + (m2 / 4 ) + (m3 / 4);
-        departmentName = inputFromUser.inputDepartmentName();
-        status = checkSeatAvailable(departmentName,cutOffMark);
-        success = con.insertNewAdmissionDetails(name,dateOfBirth,gender,cutOffMark,departmentName,status,mailId,district);
-        if(success)
-        {
-            System.out.println(".....Your admission details added Successfully.....");
-        }
-
     }
 
     public void displayDepartmentDetails() throws Exception {
@@ -618,11 +618,6 @@ public class StudentFunction1 {
     }
 
     public void displayStudentPersonalDetails() throws Exception {
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
         List<PersonalDetails>personalDetailsList;
         String align = "| %-9s | %-4s | %-12s | %-14s |%n";
         System.out.format("------------+------------+--------------+----------------+%n");
@@ -676,25 +671,24 @@ public class StudentFunction1 {
     }
 
     public void searchByStudentId() throws Exception {
-        Student student1;
+        Student student;
         if (roles.equalsIgnoreCase("Admin") || roles.equalsIgnoreCase("Faculty")) {
             System.out.println("Enter the Student RollNumber to search :");
             id = sc.next();
         } else {
             id = uId;
         }
-        student1 = con.getByStudentId(id);
-        if (student1 == null) {
+        student = con.getByStudentId(id);
+        if (student == null) {
             System.out.println("There is no record");
         } else
         {
-            System.out.println(student1);
-        String align = "| %-11s | %-19s | %-19s | %-7d | %-19s | %-13s |%n";
-        System.out.format("+-------------+---------------------+---------------------+---------+---------------------+---------------+%n");
-        System.out.format("|RollId       |StudentName          |DepartmentName       |Year     |PhoneNumber          |MailId         |%n");
-        System.out.format("+-------------+---------------------+---------------------+---------+---------------------+---------------+%n");
-        System.out.format(align, student1.getRollNumber(), student1.getStudentName(), student1.getDepartmentName(), student1.getYear(), student1.getMailId(), student1.getPhoneNumber());
-        System.out.format("+-------------+---------------------+---------------------+---------+---------------------+---------------+%n");
+        String align = "| %-11s | %-19s | %-16s | %-7d | %-19s | %-13s | %-12s | %-11s | %-10s |%n";
+        System.out.format("+-------------+---------------------+------------------+---------+---------------------+---------------+--------------+-------------+------------+%n");
+        System.out.format("|RollId       |StudentName          |DepartmentName    |Year     |PhoneNumber          |MailId         |DOB           |Gender       |District    |%n");
+        System.out.format("+-------------+---------------------+------------------+---------+---------------------+---------------+--------------+-------------+------------+%n");
+        System.out.format(align, student.getRollNumber(), student.getStudentName(), student.getDepartmentName(), student.getYear(), student.getMailId(), student.getPhoneNumber(), student.getPersonalDetails().getDateOfBirth(),student.getPersonalDetails().getGender(),student.getPersonalDetails().getDistrict());
+        System.out.format("+-------------+---------------------+------------------+---------+---------------------+---------------+--------------+-------------+------------+%n");
     }
     }
 
@@ -758,6 +752,8 @@ public class StudentFunction1 {
                     success = con.updateSeats(availableSeats, departmentName);
                 } else {
                     status = "Rejected";
+                    System.out.println("...Sorry, you are not placed....");
+
                 }
             }
         }
